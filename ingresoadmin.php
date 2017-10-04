@@ -21,6 +21,9 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
     case "date":
       $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
       break;
+    case "password":
+      $theValue = ($theValue != "") ? password($theValue) : "NULL";
+      break;      
     case "defined":
       $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
       break;
@@ -43,33 +46,50 @@ if (isset($_GET['accesscheck'])) {
 if (isset($_POST['UsuarioAdmin'])) {
   $loginUsername=$_POST['UsuarioAdmin'];
   $password=$_POST['Contrasena'];
+  $hash=password_hash($password, PASSWORD_DEFAULT);
   $MM_fldUserAuthorization = "";
   $MM_redirectLoginSuccess = "admin.php";
   $MM_redirectLoginFailed = "ingresoadmin.php";
   $MM_redirecttoReferrer = false;
   mysqli_select_db($ConexionCotizador, $database_ConexionCotizador);
-  
-  $LoginRS__query=sprintf("SELECT USER, PASS FROM usuario WHERE USER=%s AND PASS=%s",
-    GetSQLValueString($loginUsername, "text"), GetSQLValueString($password, "text")); 
+  //if(password_verify($password,$hash)){
+      $LoginRS__query=sprintf("SELECT USER, PASS FROM usuario WHERE USER=%s",
+    GetSQLValueString($loginUsername, "text")); 
    
-  $LoginRS = mysqli_query($ConexionCotizador, $LoginRS__query) or die(mysqli_error($ConexionCotizador));
-  $loginFoundUser = mysqli_num_rows($LoginRS);
-  if ($loginFoundUser) {
-     $loginStrGroup = "";
-    
-	if (PHP_VERSION >= 5.1) {session_regenerate_id(true);} else {session_regenerate_id();}
-    //declare two session variables and assign them
-    $_SESSION['MM_Username'] = $loginUsername;
-    $_SESSION['MM_UserGroup'] = $loginStrGroup;	      
+    $LoginRS = mysqli_query($ConexionCotizador, $LoginRS__query) or die(mysqli_error($ConexionCotizador));
+    $verificarPASS=mysqli_fetch_assoc($LoginRS);
 
-    if (isset($_SESSION['PrevUrl']) && false) {
-      $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
+    if(password_verify($verificarPASS['PASS'],$hash)){
+        $loginFoundUser = mysqli_num_rows($LoginRS);
+        if ($loginFoundUser) {
+            $loginStrGroup = "";
+    
+           if (PHP_VERSION >= 5.1) {session_regenerate_id(true);} else {session_regenerate_id();}
+    //declare two session variables and assign them
+              $_SESSION['MM_Username'] = $loginUsername;
+              $_SESSION['MM_UserGroup'] = $loginStrGroup;       
+
+              if (isset($_SESSION['PrevUrl']) && false) {
+                $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];  
+              }
+              header("Location: " . $MM_redirectLoginSuccess );
+        }
+          else {
+              header("Location: ". $MM_redirectLoginFailed );
+          }       
+
     }
-    header("Location: " . $MM_redirectLoginSuccess );
-  }
-  else {
-    header("Location: ". $MM_redirectLoginFailed );
-  }
+    else{
+        echo '<script type="text/javascript"> alert("Contraseña invalida"); </script>';
+    }
+
+
+
+  //}
+
+
+  
+
 }
 
 /*$usuario = $_POST['UsuarioAdmin'];
@@ -126,7 +146,7 @@ if($row = mysqli_fetch_array($ConexionCotizador,$result)){
                 </span>
                 <br />
               	<span style="margin-left:10px;">  
-                <tr><th scope="row">Contraseña</th> <td><input name="Contrasena" type="text" size="30" maxlength="30" /></td></tr>
+                <tr><th scope="row">Contraseña</th> <td><input name="Contrasena" type="password" size="30" maxlength="30" /></td></tr>
                 </span>
                 <br />
                 <span style="position:relative; left:50%;">

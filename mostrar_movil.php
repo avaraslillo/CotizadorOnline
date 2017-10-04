@@ -109,8 +109,8 @@ $totalRows_MostrarImagen1 = mysqli_num_rows($MostrarImagen1);
     	Buscar tu móvil al mejor precio
     <br />    
      <form id="BusqText" name="BusqText" method="post" >   
-      <input type="text" id="celular" name="celular" size="50" onKeyUp="recuperardatosPalabra()"/>
-      <input id="busqueda" value="Buscar" name="busqueda" type="button"  />
+      <input type="text" id="celular" name="celular" size="50" />
+      <input id="busqueda" value="Buscar" name="busqueda" type="button" onclick="recuperardatosBoton2(celular.value);"  />
       </form>
  	</div>
     </div>
@@ -121,8 +121,7 @@ $totalRows_MostrarImagen1 = mysqli_num_rows($MostrarImagen1);
 
   
 
-	<div id="PanelPrincipal">
-		<div id="PanelMoviles">
+		<div id="PanelMovil">
 
         	<div id="FichaMovil">
         	<div id="ImagenMovil">
@@ -206,12 +205,8 @@ $totalRows_MostrarImagen1 = mysqli_num_rows($MostrarImagen1);
                 </table>
                                 
           </div>
-
+        </div>
       </div>
- 
-  </div>
-                      	
-</div>
            <div class="sidenav" id="Disponibilidad">
            <table border="1">
            <tr>

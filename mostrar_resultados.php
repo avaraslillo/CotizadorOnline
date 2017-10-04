@@ -40,7 +40,14 @@ $query_MostrarTiendas = "SELECT * FROM tienda";
 $MostrarTiendas = mysqli_query($ConexionCotizador, $query_MostrarTiendas) or die(mysqli_error());
 $row_MostrarTiendas = mysqli_fetch_assoc($MostrarTiendas);
 $totalRows_MostrarTiendas = mysqli_num_rows($MostrarTiendas);
+
+$query_BuscarMoviles = "SELECT movil.ID_MOVIL, movil.MODELO, imagen.RUTA_IMAGEN, imagen.ORDEN_IMAGEN FROM movil, imagen WHERE movil.MODELO LIKE '%".$_GET['palabra']."%'  AND  imagen.ORDEN_IMAGEN='1' AND imagen.ID_MOVIL=movil.ID_MOVIL GROUP BY movil.ID_MOVIL"; 
+$BuscarMoviles = mysqli_query( $ConexionCotizador, $query_BuscarMoviles) or die(mysqli_error($BuscarMoviles));
+$row_BuscarMoviles = mysqli_fetch_assoc($BuscarMoviles);
+$totalRows_BuscarMoviles = mysqli_num_rows($BuscarMoviles);
 ?>
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -129,6 +136,14 @@ $totalRows_MostrarTiendas = mysqli_num_rows($MostrarTiendas);
 </div>
 	<div id="PanelPrincipal">
 		<div id="PanelMoviles">
+      <?php
+do{ 
+  print ('<div id="Resultado">
+<a href="mostrar_movil.php?IDmovil='.$row_BuscarMoviles['ID_MOVIL'].'"><img src="'.$row_BuscarMoviles['RUTA_IMAGEN'].'" width="60%" height="60%" style="margin:10px 10px 10px 10px; display:block; left: 50%;"/></a>
+<br /><span style"text-align:center;">'.$row_BuscarMoviles['MODELO'].'</span></div>');
+} while ($row_BuscarMoviles = mysqli_fetch_assoc($BuscarMoviles)); 
+
+?>
     	</div>
    </div>
    
@@ -144,4 +159,6 @@ $totalRows_MostrarTiendas = mysqli_num_rows($MostrarTiendas);
 mysqli_free_result($MostrarMarcas);
 
 mysqli_free_result($MostrarTiendas);
+
+mysqli_free_result($BuscarMoviles);
 ?>
